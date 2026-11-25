@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>おうちごはん帖 | 毎日がちょっと楽しくなるレシピサイト</title>
+
+  <!-- Google Fonts: 温かみのある日本語フォントと可読性の高いサンセリフ体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tailwind カスタムテーマ設定（生成り・テラコッタ・セージグリーン） -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: {
+              50: '#FDFBF7',
+              100: '#FAF7F2',
+              200: '#F2ECE1',
+              300: '#E5DAC8',
+            },
+            terracotta: {
+              50: '#FDF3EF',
+              100: '#F9E1D7',
+              400: '#E5835E',
+              500: '#D96B43',
+              600: '#C05631',
+              700: '#9E4425',
+            },
+            sage: {
+              50: '#F2F6F3',
+              100: '#E1ECE4',
+              500: '#6B8E78',
+              600: '#557561',
+              700: '#415C4B',
+            },
+            ink: {
+              900: '#2E2824',
+              700: '#524943',
+              500: '#7D726A',
+              400: '#A39890',
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', '"Inter"', 'sans-serif'],
+            serif: ['"Shippori Mincho"', 'serif'],
+          },
+          boxShadow: {
+            soft: '0 8px 28px -6px rgba(46, 40, 36, 0.08)',
+            card: '0 4px 16px -4px rgba(46, 40, 36, 0.07)',
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-cream-100 text-ink-900 font-sans antialiased selection:bg-terracotta-100 selection:text-terracotta-700 min-h-screen flex flex-col">
+
+  <!-- =========================================================
+       ヘッダー：ロゴ・検索バー・レシピ投稿ボタン
+       ========================================================= -->
+  <header class="sticky top-0 z-30 bg-cream-50/90 backdrop-blur-md border-b border-cream-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- ブランドロゴ -->
+      <a href="#top" onclick="resetAllFilters(); return false;" class="flex items-center gap-2.5 group focus:outline-none">
+        <div class="w-10 h-10 rounded-2xl bg-terracotta-500 text-white flex items-center justify-center shadow-sm group-hover:bg-terracotta-600 transition-colors">
+          <!-- 土鍋・お皿アイコンSVG -->
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 13h18v2a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-2Z"/>
+            <path d="M5 13a7 7 0 0 1 14 0"/>
+            <path d="M12 6V4"/>
+            <path d="M2 13h20"/>
+          </svg>
+        </div>
+        <div>
+          <span class="font-serif text-xl sm:text-2xl font-bold tracking-wide text-ink-900 block leading-none">おうちごはん帖</span>
+          <span class="text-[11px] text-ink-500 tracking-wider">毎日の食卓に、小さな幸せを</span>
+        </div>
+      </a>
+
+      <!-- ヘッダー右側のアクションボタン -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button
+          id="headerFavBtn"
+          type="button"
+          onclick="selectCategory('お気に入り')"
+          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-ink-700 bg-cream-100 hover:bg-cream-200 border border-cream-300/70 transition-colors"
+          title="お気に入りレシピを見る"
+        >
+          <svg class="w-4 h-4 text-terracotta-500" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span class="hidden sm:inline">お気に入り</span>
+          <span id="favCountBadge" class="px-1.5 py-0.5 text-xs rounded-full bg-terracotta-100 text-terracotta-700 font-bold">0</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="openPostModal()"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white bg-terracotta-500 hover:bg-terracotta-600 active:scale-[0.98] shadow-sm transition-all"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          <span>レシピを投稿</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       ヒーロー＆検索・絞り込みセクション
+       ========================================================= -->
+  <section id="top" class="bg-gradient-to-b from-cream-50 to-cream-100 border-b border-cream-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-7">
+      <div class="max-w-2xl mx-auto text-center mb-6">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sage-100 text-sage-700 mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-sage-600"></span>
+          今日の献立、ここから決めよう
+        </span>
+        <h1 class="font-serif text-2xl sm:text-4xl font-bold text-ink-900 leading-snug mb-2">
+          冷蔵庫の食材から、<br class="sm:hidden" />おいしい一皿を。
+        </h1>
+        <p class="text-sm sm:text-base text-ink-500">
+          定番のおかずから15分時短メニュー、ほっとするデザートまで。人数調整やキッチンタイマー付きで調理をサポートします。
+        </p>
+      </div>
+
+      <!-- リアルタイム検索入力欄 -->
+      <div class="max-w-2xl mx-auto mb-6">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-ink-400">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+          </div>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="料理名・食材名で検索（例：肉じゃが、鶏肉、トマト、プリン）"
+            class="w-full pl-12 pr-12 py-3.5 rounded-2xl bg-white border border-cream-300 text-ink-900 placeholder-ink-400 shadow-soft focus:outline-none focus:ring-2 focus:ring-terracotta-400 focus:border-terracotta-400 transition-all text-sm sm:text-base"
+          />
+          <button
+            id="clearSearchBtn"
+            type="button"
+            onclick="clearSearch()"
+            class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-ink-400 hover:text-ink-700"
+            aria-label="検索をクリア"
+          >
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="m15 9-6 6M9 9l6 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- カテゴリフィルター -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mb-5" id="categoryContainer" role="tablist" aria-label="カテゴリフィルター">
+        <!-- JSで動的に描画 -->
+      </div>
+
+      <!-- 冷蔵庫にある食材チップ -->
+      <div class="bg-white/85 rounded-2xl border border-cream-200 p-4 shadow-sm max-w-4xl mx-auto">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div class="flex items-center gap-2 text-sm font-bold text-ink-700">
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-sage-100 text-sage-700">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 6a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6Z"/>
+                <path d="M5 10h14"/>
+                <path d="M15 7v6"/>
+              </svg>
+            </span>
+            <span>冷蔵庫にある食材で絞り込む</span>
+            <span class="text-xs font-normal text-ink-500 hidden sm:inline">（複数選択OK）</span>
+          </div>
+          <button
+            id="clearFridgeBtn"
+            type="button"
+            onclick="clearFridgeFilters()"
+            class="hidden text-xs font-medium text-terracotta-600 hover:text-terracotta-700 underline underline-offset-2"
+          >
+            選択をリセット
+          </button>
+        </div>
+        <div id="fridgeChipsContainer" class="flex flex-wrap gap-2">
+          <!-- JSで動的に描画 -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       メインコンテンツ：レシピ一覧グリッド
+       ========================================================= -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+    <!-- 件数＆並び替えバー -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div class="flex items-baseline gap-2">
+        <h2 id="listHeading" class="font-serif text-xl sm:text-2xl font-bold text-ink-900">すべてのレシピ</h2>
+        <span id="recipeCount" class="text-sm font-medium text-ink-500">0品</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="sortSelect" class="text-xs font-medium text-ink-500">並び替え:</label>
+        <select
+          id="sortSelect"
+          onchange="renderRecipes()"
+          class="text-sm bg-white border border-cream-300 rounded-xl px-3 py-1.5 text-ink-700 focus:outline-none focus:ring-2 focus:ring-terracotta-400"
+        >
+          <option value="default">おすすめ順</option>
+          <option value="timeAsc">調理時間が短い順</option>
+          <option value="calAsc">カロリーが低い順</option>
+          <option value="newest">新しい順</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- レシピカード一覧 -->
+    <div id="recipeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- JSで動的に描画 -->
+    </div>
+
+    <!-- 該当なし時のエンプティステート -->
+    <div id="emptyState" class="hidden text-center py-16 px-4 bg-white rounded-3xl border border-cream-200 shadow-card">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cream-100 text-ink-400 flex items-center justify-center">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.3-4.3"/>
+          <path d="M8 11h6"/>
+        </svg>
+      </div>
+      <h3 class="font-serif text-lg font-bold text-ink-900 mb-1">条件に合うレシピが見つかりませんでした</h3>
+      <p class="text-sm text-ink-500 mb-5">検索キーワードや食材の選択を少し減らして、もう一度探してみてください。</p>
+      <button
+        type="button"
+        onclick="resetAllFilters()"
+        class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-terracotta-500 hover:bg-terracotta-600 transition-colors"
+      >
+        条件をすべてリセット
+      </button>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       フッター
+       ========================================================= -->
+  <footer class="bg-cream-50 border-t border-cream-200 py-8 mt-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink-500">
+      <div class="flex items-center gap-2">
+        <span class="font-serif text-base font-bold text-ink-700">おうちごはん帖</span>
+        <span>— 毎日の食卓を応援するレシピアプリ</span>
+      </div>
+      <p>お気に入りや投稿レシピはお使いのブラウザ（localStorage）に保存されます。</p>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       レシピ詳細モーダル（人数切替・手順チェック・内蔵タイマー）
+       ========================================================= -->
+  <div id="detailModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-ink-900/50 backdrop-blur-sm p-3 sm:p-6 flex items-start justify-center" role="dialog" aria-modal="true">
+    <div class="relative w-full max-w-3xl bg-cream-50 rounded-3xl shadow-2xl border border-cream-200 overflow-hidden my-auto">
+      <!-- モーダル上部ビジュアル＆閉じるボタン -->
+      <div id="modalHeaderVisual" class="relative h-56 sm:h-64 flex items-center justify-center overflow-hidden">
+        <!-- SVGイラストが挿入される -->
+        <button
+          type="button"
+          onclick="closeDetailModal()"
+          class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-ink-700 shadow-md flex items-center justify-center transition-transform hover:scale-105"
+          aria-label="閉じる"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+
+        <button
+          id="modalFavBtn"
+          type="button"
+          class="absolute top-4 left-4 z-10 px-3.5 py-2 rounded-full bg-white/90 hover:bg-white shadow-md flex items-center gap-1.5 text-sm font-bold transition-transform hover:scale-105"
+        >
+          <!-- JSでハート状態更新 -->
+        </button>
+      </div>
+
+      <!-- モーダル本文 -->
+      <div class="p-5 sm:p-8 space-y-7 max-h-[75vh] overflow-y-auto">
+        <!-- タイトル・メタ情報 -->
+        <div>
+          <div id="modalTags" class="flex flex-wrap gap-1.5 mb-2.5"></div>
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <h2 id="modalTitle" class="font-serif text-2xl sm:text-3xl font-bold text-ink-900"></h2>
+            <div id="modalDeleteArea"></div>
+          </div>
+          <p id="modalDesc" class="text-sm sm:text-base text-ink-700 mt-2 leading-relaxed"></p>
+
+          <!-- メタカード（調理時間・難易度・カロリー） -->
+          <div class="grid grid-cols-3 gap-2.5 sm:gap-4 mt-5">
+            <div class="bg-white rounded-2xl p-3 border border-cream-200 text-center">
+              <span class="block text-[11px] text-ink-500 mb-0.5">調理時間</span>
+              <span id="modalTime" class="text-sm sm:text-base font-bold text-ink-900"></span>
+            </div>
+            <div class="bg-white rounded-2xl p-3 border border-cream-200 text-center">
+              <span class="block text-[11px] text-ink-500 mb-0.5">難易度</span>
+              <span id="modalDifficulty" class="text-sm sm:text-base font-bold text-ink-900"></span>
+            </div>
+            <div class="bg-white rounded-2xl p-3 border border-cream-200 text-center">
+              <span class="block text-[11px] text-ink-500 mb-0.5">カロリー（1人分）</span>
+              <span id="modalCalories" class="text-sm sm:text-base font-bold text-ink-900"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 材料セクション（人数切り替え自動再計算） -->
+        <div class="bg-white rounded-2xl p-5 border border-cream-200 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-cream-100">
+            <h3 class="font-serif text-lg font-bold text-ink-900 flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded-full bg-terracotta-500 inline-block"></span>
+              材料
+            </h3>
+            <!-- 人数切替ボタン（1人分〜4人分） -->
+            <div class="inline-flex items-center bg-cream-100 p-1 rounded-xl border border-cream-200" role="group" aria-label="人数切り替え">
+              <button type="button" onclick="changeServings(1)" data-serving="1" class="serving-btn px-3 py-1 rounded-lg text-xs font-bold transition-colors">1人分</button>
+              <button type="button" onclick="changeServings(2)" data-serving="2" class="serving-btn px-3 py-1 rounded-lg text-xs font-bold transition-colors">2人分</button>
+              <button type="button" onclick="changeServings(3)" data-serving="3" class="serving-btn px-3 py-1 rounded-lg text-xs font-bold transition-colors">3人分</button>
+              <button type="button" onclick="changeServings(4)" data-serving="4" class="serving-btn px-3 py-1 rounded-lg text-xs font-bold transition-colors">4人分</button>
+            </div>
+          </div>
+          <ul id="modalIngredients" class="divide-y divide-cream-100 text-sm sm:text-base">
+            <!-- JSで動的に描画 -->
+          </ul>
+        </div>
+
+        <!-- 内蔵キッチンタイマー -->
+        <div class="bg-sage-50 rounded-2xl p-5 border border-sage-100">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <h3 class="font-serif text-lg font-bold text-sage-700 flex items-center gap-2">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"/>
+                <path d="M12 9v4l2 2"/>
+                <path d="M9 2h6"/>
+                <path d="M12 2v3"/>
+              </svg>
+              キッチンタイマー
+            </h3>
+            <!-- プリセットボタン -->
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="setTimerMinutes(3)" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-sage-700 border border-sage-200 hover:bg-sage-100 transition-colors">3分</button>
+              <button type="button" onclick="setTimerMinutes(5)" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-sage-700 border border-sage-200 hover:bg-sage-100 transition-colors">5分</button>
+              <button type="button" onclick="setTimerMinutes(10)" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-sage-700 border border-sage-200 hover:bg-sage-100 transition-colors">10分</button>
+              <div class="flex items-center gap-1 ml-1">
+                <input
+                  id="customTimerInput"
+                  type="number"
+                  min="1"
+                  max="120"
+                  placeholder="分"
+                  class="w-14 px-2 py-1 rounded-lg text-xs bg-white border border-sage-200 text-ink-900 focus:outline-none focus:ring-2 focus:ring-sage-500"
+                />
+                <button type="button" onclick="applyCustomTimer()" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sage-600 text-white hover:bg-sage-700 transition-colors">設定</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-xl p-4 border border-sage-100">
+            <div class="flex items-center gap-3">
+              <span id="timerDisplay" class="font-mono text-3xl sm:text-4xl font-bold tracking-wider text-ink-900">03:00</span>
+              <span id="timerStatusBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-cream-100 text-ink-500">待機中</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                id="timerStartPauseBtn"
+                type="button"
+                onclick="toggleTimer()"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-terracotta-500 hover:bg-terracotta-600 transition-colors min-w-[100px]"
+              >
+                スタート
+              </button>
+              <button
+                type="button"
+                onclick="resetTimer()"
+                class="px-4 py-2.5 rounded-xl text-sm font-bold text-ink-700 bg-cream-100 hover:bg-cream-200 border border-cream-300 transition-colors"
+              >
+                リセット
+              </button>
+            </div>
+          </div>
+
+          <!-- タイマー完了アラートバナー（alert()は使用しない） -->
+          <div id="timerDoneBanner" class="hidden mt-3 p-3.5 rounded-xl bg-terracotta-500 text-white flex items-center justify-between gap-3 animate-pulse">
+            <div class="flex items-center gap-2 font-bold text-sm">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+              </svg>
+              <span>時間になりました！お料理の様子を確認してください。</span>
+            </div>
+            <button type="button" onclick="dismissTimerAlert()" class="px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-bold shrink-0">OK</button>
+          </div>
+        </div>
+
+        <!-- 作り方セクション（チェックボックス＆進捗バー付き） -->
+        <div class="bg-white rounded-2xl p-5 border border-cream-200 shadow-sm">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h3 class="font-serif text-lg font-bold text-ink-900 flex items-center gap-2">
+              <span class="w-1.5 h-5 rounded-full bg-sage-600 inline-block"></span>
+              作り方
+            </h3>
+            <span id="stepProgressText" class="text-xs font-bold text-sage-700 bg-sage-50 px-2.5 py-1 rounded-full">0 / 0 完了</span>
+          </div>
+          <!-- 進捗バー -->
+          <div class="w-full h-2 bg-cream-100 rounded-full overflow-hidden mb-4">
+            <div id="stepProgressBar" class="h-full bg-sage-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <ol id="modalSteps" class="space-y-3">
+            <!-- JSで動的に描画 -->
+          </ol>
+        </div>
+
+        <!-- おいしく作るコツ -->
+        <div class="bg-terracotta-50 rounded-2xl p-5 border border-terracotta-100">
+          <h3 class="font-serif text-base font-bold text-terracotta-700 mb-1.5 flex items-center gap-1.5">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+              <path d="M9 18h6"/>
+              <path d="M10 22h4"/>
+            </svg>
+            おいしく作るコツ・ポイント
+          </h3>
+          <p id="modalTips" class="text-sm text-ink-700 leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       マイレシピ投稿モーダル
+       ========================================================= -->
+  <div id="postModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-ink-900/50 backdrop-blur-sm p-3 sm:p-6 flex items-start justify-center" role="dialog" aria-modal="true">
+    <div class="relative w-full max-w-2xl bg-cream-50 rounded-3xl shadow-2xl border border-cream-200 overflow-hidden my-auto">
+      <div class="px-6 py-4 bg-white border-b border-cream-200 flex items-center justify-between">
+        <h2 class="font-serif text-xl font-bold text-ink-900">マイレシピを投稿する</h2>
+        <button
+          type="button"
+          onclick="closePostModal()"
+          class="w-9 h-9 rounded-full bg-cream-100 hover:bg-cream-200 text-ink-700 flex items-center justify-center transition-colors"
+          aria-label="閉じる"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="postRecipeForm" onsubmit="handlePostRecipe(event)" class="p-6 space-y-5 max-h-[78vh] overflow-y-auto">
+        <!-- 料理名 -->
+        <div>
+          <label for="postTitle" class="block text-sm font-bold text-ink-700 mb-1">料理名 <span class="text-terracotta-500">*</span></label>
+          <input id="postTitle" type="text" required placeholder="例：バター香るきのこの和風パスタ" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400" />
+        </div>
+
+        <!-- カテゴリ・調理時間・難易度・カロリー -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <label for="postCategory" class="block text-xs font-bold text-ink-700 mb-1">カテゴリ</label>
+            <select id="postCategory" class="w-full px-3 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400">
+              <option value="和食">和食</option>
+              <option value="洋食">洋食</option>
+              <option value="中華">中華</option>
+              <option value="デザート">デザート</option>
+            </select>
+          </div>
+          <div>
+            <label for="postTime" class="block text-xs font-bold text-ink-700 mb-1">調理時間（分）</label>
+            <input id="postTime" type="number" min="1" max="240" value="15" required class="w-full px-3 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400" />
+          </div>
+          <div>
+            <label for="postDifficulty" class="block text-xs font-bold text-ink-700 mb-1">難易度</label>
+            <select id="postDifficulty" class="w-full px-3 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400">
+              <option value="かんたん">かんたん</option>
+              <option value="ふつう">ふつう</option>
+              <option value="本格派">本格派</option>
+            </select>
+          </div>
+          <div>
+            <label for="postCalories" class="block text-xs font-bold text-ink-700 mb-1">カロリー（kcal）</label>
+            <input id="postCalories" type="number" min="10" max="2000" value="350" required class="w-full px-3 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400" />
+          </div>
+        </div>
+
+        <!-- ひとこと説明 -->
+        <div>
+          <label for="postDesc" class="block text-sm font-bold text-ink-700 mb-1">レシピの紹介文</label>
+          <input id="postDesc" type="text" placeholder="例：忙しい平日の夜でもパパッと作れる、旨みたっぷりの一品です。" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400" />
+        </div>
+
+        <!-- 材料（2人分基準） -->
+        <div>
+          <label for="postIngredients" class="block text-sm font-bold text-ink-700 mb-1">
+            材料（2人分・1行に1つ「材料名, 分量, 単位」で入力） <span class="text-terracotta-500">*</span>
+          </label>
+          <textarea
+            id="postIngredients"
+            rows="4"
+            required
+            placeholder="鶏もも肉, 300, g&#10;玉ねぎ, 1, 個&#10;しょうゆ, 2, 大さじ&#10;塩こしょう, 適量, "
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400"
+          ></textarea>
+          <p class="text-[11px] text-ink-500 mt-1">※数値をカンマ区切りで入れると、人数切替で自動再計算されます。</p>
+        </div>
+
+        <!-- 作り方 -->
+        <div>
+          <label for="postSteps" class="block text-sm font-bold text-ink-700 mb-1">
+            作り方（1行に1手順ずつ入力） <span class="text-terracotta-500">*</span>
+          </label>
+          <textarea
+            id="postSteps"
+            rows="4"
+            required
+            placeholder="食材を食べやすい大きさに切る。&#10;フライパンに油を熱し、中火で炒める。&#10;調味料を加えて全体に絡めたら完成。"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400"
+          ></textarea>
+        </div>
+
+        <!-- コツ -->
+        <div>
+          <label for="postTips" class="block text-sm font-bold text-ink-700 mb-1">おいしく作るコツ</label>
+          <input id="postTips" type="text" placeholder="例：仕上げに少しバターを加えると香りが引き立ちます。" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-cream-300 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-400" />
+        </div>
+
+        <!-- 送信ボタン -->
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onclick="closePostModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-ink-700 bg-cream-200 hover:bg-cream-300 transition-colors">キャンセル</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-terracotta-500 hover:bg-terracotta-600 shadow-sm transition-colors">レシピを公開する</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       トースト通知（alert()の代わりに使用）
+       ========================================================= -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- =========================================================
+       アプリケーションロジック（JavaScript）
+       ========================================================= -->
+  <script>
+    /* -----------------------------------------------------------
+       1. 定数・初期データ定義
+       ----------------------------------------------------------- */
+    const STORAGE_KEYS = {
+      FAVORITES: 'ouchigohan_favorites_v1',
+      USER_RECIPES: 'ouchigohan_user_recipes_v1'
+    };
+
+    const CATEGORIES = ['すべて', '和食', '洋食', '中華', '15分時短', 'デザート', 'お気に入り'];
+
+    const FRIDGE_INGREDIENTS = [
+      { id: '鶏肉', label: '鶏肉' },
+      { id: '豚肉', label: '豚肉' },
+      { id: '卵', label: '卵' },
+      { id: 'トマト', label: 'トマト' },
+      { id: '玉ねぎ', label: '玉ねぎ' },
+      { id: '豆腐', label: '豆腐' },
+      { id: 'じゃがいも', label: 'じゃがいも' },
+      { id: 'ほうれん草', label: 'ほうれん草' },
+      { id: '牛乳', label: '牛乳' }
+    ];
+
+    /**
+     * 充実した初期レシピデータ（9品）
+     * amount が数値の材料は人数切り替え時に自動再計算されます。
+     */
+    const INITIAL_RECIPES = [
+      {
+        id: 'rec-nikujaga',
+        title: 'ほっこり定番 肉じゃが',
+        category: '和食',
+        time: 30,
+        difficulty: 'ふつう',
+        calories: 380,
+        baseServings: 2,
+        description: 'ほくほくのじゃがいもに甘辛いだしがじゅわっと染み込む、おうちごはんの王道おかずです。',
+        fridgeTags: ['豚肉', 'じゃがいも', '玉ねぎ'],
+        svgKey: 'nikujaga',
+        bgClass: 'from-amber-50 via-orange-50 to-cream-200',
+        ingredients: [
+          { name: '豚こま切れ肉（または牛薄切り肉）', amount: 180, unit: 'g' },
+          { name: 'じゃがいも（メークイン推奨）', amount: 2, unit: '個' },
+          { name: '玉ねぎ', amount: 1, unit: '個' },
+          { name: 'にんじん', amount: 0.5, unit: '本' },
+          { name: '絹さや（彩り用）', amount: 4, unit: '枚' },
+          { name: 'だし汁', amount: 250, unit: 'ml' },
+          { name: 'しょうゆ', amount: 2, unit: '大さじ' },
+          { name: 'みりん', amount: 2, unit: '大さじ' },
+          { name: '砂糖', amount: 1.5, unit: '大さじ' },
+          { name: 'サラダ油', amount: 1, unit: '小さじ' }
+        ],
+        steps: [
+          'じゃがいもは大きめの一口大、にんじんは乱切り、玉ねぎはくし切りにする。豚肉は食べやすく切る。',
+          '鍋にサラダ油を熱し、豚肉を中火で炒める。色が変わったら玉ねぎ・にんじん・じゃがいもの順に加えて油をなじませる。',
+          'だし汁と砂糖・みりんを加え、煮立ったらアクを取り除く。',
+          'しょうゆを加え、落としぶたをして弱めの中火で15〜18分、じゃがいもに竹串がすっと通るまで煮る。',
+          '火を止めて5分ほど置いて味を染み込ませ、仕上げにさっと茹でた絹さやを添える。'
+        ],
+        tips: '煮終わったあとに一度冷ますと、温度が下がる過程でじゃがいもの中までしっかり味が染み込みます。'
+      },
+      {
+        id: 'rec-omurice',
+        title: 'ふわとろ卵のオムライス',
+        category: '洋食',
+        time: 20,
+        difficulty: 'ふつう',
+        calories: 560,
+        baseServings: 2,
+        description: 'バター香る半熟とろとろ卵と、甘酸っぱいチキンライスの相性が抜群の一皿です。',
+        fridgeTags: ['鶏肉', '卵', '玉ねぎ', '牛乳'],
+        svgKey: 'omurice',
+        bgClass: 'from-yellow-50 via-amber-50 to-orange-100',
+        ingredients: [
+          { name: '温かいごはん', amount: 360, unit: 'g' },
+          { name: '鶏もも肉', amount: 120, unit: 'g' },
+          { name: '玉ねぎ', amount: 0.5, unit: '個' },
+          { name: '卵', amount: 4, unit: '個' },
+          { name: '牛乳', amount: 2, unit: '大さじ' },
+          { name: 'トマトケチャップ', amount: 4, unit: '大さじ' },
+          { name: 'バター', amount: 20, unit: 'g' },
+          { name: '塩・こしょう', amount: '少々', unit: '' }
+        ],
+        steps: [
+          '鶏肉は1.5cm角に切り、玉ねぎはみじん切りにする。卵はボウルに割り入れ、牛乳と塩少々を加えてよく溶く。',
+          'フライパンにバター半量を熱し、鶏肉と玉ねぎを炒める。火が通ったらケチャップを加えて1分ほど炒め、酸味を飛ばす。',
+          'ごはんを加えて手早くほぐしながら炒め、塩・こしょうで味を調えて器に盛る。',
+          'フライパンをきれいにして残りのバターを中火で熱し、1人分ずつの卵液を流し入れる。',
+          '外側から内側へ大きくかき混ぜ、半熟状になったら火を止めてチキンライスの上にすべらせ、お好みでケチャップをかける。'
+        ],
+        tips: 'ケチャップをごはんより先に具材と炒めることで水分と酸味が飛び、ベチャッとせずコクのある仕上がりになります。'
+      },
+      {
+        id: 'rec-teriyaki',
+        title: '照りうま鶏の照り焼き',
+        category: '和食',
+        time: 15,
+        difficulty: 'かんたん',
+        calories: 420,
+        baseServings: 2,
+        description: '皮はパリッと香ばしく、中はジューシー。甘辛い照り焼きダレでごはんが止まりません。',
+        fridgeTags: ['鶏肉'],
+        svgKey: 'teriyaki',
+        bgClass: 'from-orange-50 via-amber-100/70 to-cream-200',
+        ingredients: [
+          { name: '鶏もも肉', amount: 300, unit: 'g' },
+          { name: 'しょうゆ', amount: 2, unit: '大さじ' },
+          { name: 'みりん', amount: 2, unit: '大さじ' },
+          { name: '酒', amount: 2, unit: '大さじ' },
+          { name: '砂糖', amount: 1, unit: '大さじ' },
+          { name: '白いりごま', amount: '適量', unit: '' },
+          { name: 'サラダ油', amount: 1, unit: '小さじ' }
+        ],
+        steps: [
+          '鶏もも肉は厚い部分に切り込みを入れて均一にし、フォークで皮目に数か所穴をあける。調味料はすべて混ぜ合わせておく。',
+          'フライパンに油を薄く引き、鶏肉の皮目を下にして中火で4〜5分、こんがり焼き色がつくまで焼く。',
+          '裏返してふたをし、弱火で4分ほど蒸し焼きにして中まで火を通す。',
+          '余分な脂をキッチンペーパーで拭き取り、合わせた調味料を加えて中火で煮絡める。',
+          'タレにとろみがついたら食べやすく切り分け、器に盛って白いりごまをふる。'
+        ],
+        tips: 'タレを入れる前にフライパンの余分な脂を拭き取ると、タレが弾かれずツヤよく均一に絡みます。'
+      },
+      {
+        id: 'rec-mapo',
+        title: '旨辛！本格麻婆豆腐',
+        category: '中華',
+        time: 15,
+        difficulty: 'ふつう',
+        calories: 340,
+        baseServings: 2,
+        description: '香味野菜の香りとコク深い旨辛あんが、ぷるぷるの豆腐に絡む満足おかずです。',
+        fridgeTags: ['豆腐', '豚肉'],
+        svgKey: 'mapo',
+        bgClass: 'from-red-50 via-orange-50 to-amber-50',
+        ingredients: [
+          { name: '木綿豆腐（または絹ごし）', amount: 1, unit: '丁' },
+          { name: '豚ひき肉', amount: 120, unit: 'g' },
+          { name: '長ねぎ（みじん切り）', amount: 0.5, unit: '本' },
+          { name: 'にんにく・しょうが（みじん切り）', amount: 1, unit: '小さじ' },
+          { name: '豆板醤', amount: 1, unit: '小さじ' },
+          { name: '鶏ガラスープ（水＋顆粒）', amount: 150, unit: 'ml' },
+          { name: 'みそ（または甜麺醤）', amount: 1, unit: '大さじ' },
+          { name: 'しょうゆ', amount: 1, unit: '大さじ' },
+          { name: '水溶き片栗粉', amount: 2, unit: '大さじ' },
+          { name: 'ごま油', amount: 1, unit: '小さじ' }
+        ],
+        steps: [
+          '豆腐は2cm角に切り、塩少々を入れた熱湯で1分ほど下茹でして水気を切る。',
+          'フライパンにごま油を熱し、豚ひき肉をパラパラになるまでしっかり炒める。',
+          'にんにく・しょうが・豆板醤を加えて香りが立つまで炒め、みそ・しょうゆ・鶏ガラスープを加える。',
+          '煮立ったら豆腐を加えて2〜3分煮込み、長ねぎを散らす。',
+          '一度火を弱めて水溶き片栗粉を回し入れ、再び強めの中火で30秒ほどしっかり沸騰させてとろみを定着させる。'
+        ],
+        tips: '豆腐を軽く下茹ですることで煮崩れしにくくなり、水っぽさも防いでとろみがピタッと決まります。'
+      },
+      {
+        id: 'rec-pasta',
+        title: 'トマトとモッツァレラのパスタ',
+        category: '洋食',
+        time: 15,
+        difficulty: 'かんたん',
+        calories: 510,
+        baseServings: 2,
+        description: 'フレッシュなトマトの甘みと、とろけるモッツァレラチーズが絡み合うイタリアンの定番。',
+        fridgeTags: ['トマト'],
+        svgKey: 'pasta',
+        bgClass: 'from-rose-50 via-red-50 to-orange-50',
+        ingredients: [
+          { name: 'スパゲッティ', amount: 180, unit: 'g' },
+          { name: '完熟トマト（またはミニトマト12個）', amount: 2, unit: '個' },
+          { name: 'モッツァレラチーズ', amount: 100, unit: 'g' },
+          { name: 'にんにく（薄切り）', amount: 1, unit: 'かけ' },
+          { name: 'オリーブオイル', amount: 2, unit: '大さじ' },
+          { name: 'フレッシュバジル', amount: 6, unit: '枚' },
+          { name: '塩・黒こしょう', amount: '適量', unit: '' }
+        ],
+        steps: [
+          'トマトは2cm角（ミニトマトは半分）に切り、モッツァレラチーズは手で一口大にちぎる。',
+          'たっぷりの湯に1%の塩を加えてスパゲッティを表示時間より1分短く茹でる。',
+          'フライパンにオリーブオイルとにんにくを入れて弱火にかけ、香りが立ったらトマトを加えて軽くつぶしながら炒める。',
+          '茹で上がったパスタと茹で汁大さじ2を加えて手早く乳化させ、塩・黒こしょうで味を調える。',
+          '火を止めてモッツァレラチーズとバジルをさっと和え、チーズが少し溶けたら器に盛る。'
+        ],
+        tips: 'モッツァレラチーズは火を止めてから予熱で和えると、溶けすぎずもちもち食感を楽しめます。'
+      },
+      {
+        id: 'rec-shogayaki',
+        title: 'ごはんが進む 豚の生姜焼き',
+        category: '和食',
+        time: 15,
+        difficulty: 'かんたん',
+        calories: 450,
+        baseServings: 2,
+        description: 'すりおろし生姜の爽やかな香りと甘辛ダレが柔らかい豚肉に絡む、定番のスタミナおかず。',
+        fridgeTags: ['豚肉', '玉ねぎ'],
+        svgKey: 'shogayaki',
+        bgClass: 'from-amber-50 via-yellow-50 to-orange-100/70',
+        ingredients: [
+          { name: '豚ロース薄切り肉（生姜焼き用）', amount: 240, unit: 'g' },
+          { name: '玉ねぎ', amount: 0.5, unit: '個' },
+          { name: 'おろししょうが', amount: 1.5, unit: '小さじ' },
+          { name: 'しょうゆ', amount: 2, unit: '大さじ' },
+          { name: 'みりん', amount: 2, unit: '大さじ' },
+          { name: '酒', amount: 1, unit: '大さじ' },
+          { name: '薄力粉', amount: 1, unit: '大さじ' },
+          { name: '千切りキャベツ（付け合わせ）', amount: '適量', unit: '' }
+        ],
+        steps: [
+          '玉ねぎは薄切りにする。しょうゆ・みりん・酒・おろししょうがを混ぜ合わせてタレを作る。',
+          '豚肉は筋切りをして薄く薄力粉をまぶす。',
+          'フライパンに油少々を中火で熱し、豚肉を広げて両面をさっと焼いたら一度取り出す。',
+          '同じフライパンで玉ねぎをしんなりするまで炒め、豚肉を戻し入れる。',
+          'タレを回し入れて強めの中火で手早く絡め、千切りキャベツを添えた皿に盛り付ける。'
+        ],
+        tips: '豚肉に薄く薄力粉をまぶしておくことで、お肉が硬くなりにくくタレもよく絡みます。'
+      },
+      {
+        id: 'rec-gomaae',
+        title: '香ばしい ほうれん草の胡麻和え',
+        category: '和食',
+        time: 10,
+        difficulty: 'かんたん',
+        calories: 95,
+        baseServings: 2,
+        description: 'あと一品ほしいときに大活躍。すりごまの豊かな香りが広がる、優しい味わいの副菜です。',
+        fridgeTags: ['ほうれん草'],
+        svgKey: 'gomaae',
+        bgClass: 'from-emerald-50 via-sage-100 to-cream-200',
+        ingredients: [
+          { name: 'ほうれん草', amount: 1, unit: '束' },
+          { name: '白すりごま', amount: 2, unit: '大さじ' },
+          { name: 'しょうゆ', amount: 1, unit: '大さじ' },
+          { name: '砂糖', amount: 2, unit: '小さじ' },
+          { name: 'だし汁（または水）', amount: 1, unit: '小さじ' }
+        ],
+        steps: [
+          '鍋に湯を沸かして塩少々を入れ、ほうれん草を根元から入れて約40〜50秒茹でる。',
+          '冷水に取って色止めし、水気をしっかり絞ってから3〜4cm幅に切る。',
+          'ボウルに白すりごま・しょうゆ・砂糖・だし汁を入れてよく混ぜ合わせる。',
+          '食べる直前にほうれん草を加えてふんわりと和え、器に盛る。'
+        ],
+        tips: 'ほうれん草の水気をしっかり絞って、食べる直前に和えると水っぽくならず香りも引き立ちます。'
+      },
+      {
+        id: 'rec-pudding',
+        title: '喫茶店風のなめらかプリン',
+        category: 'デザート',
+        time: 35,
+        difficulty: 'ふつう',
+        calories: 240,
+        baseServings: 2,
+        description: '卵と牛乳の優しいコクに、ほろ苦いカラメルが絶妙に調和する、少し固めでなめらかな王道プリン。',
+        fridgeTags: ['卵', '牛乳'],
+        svgKey: 'pudding',
+        bgClass: 'from-amber-100/70 via-yellow-50 to-cream-200',
+        ingredients: [
+          { name: '卵', amount: 2, unit: '個' },
+          { name: '牛乳', amount: 200, unit: 'ml' },
+          { name: '砂糖（プリン液用）', amount: 35, unit: 'g' },
+          { name: 'バニラエッセンス', amount: '少々', unit: '' },
+          { name: '砂糖（カラメル用）', amount: 30, unit: 'g' },
+          { name: '水（カラメル用）', amount: 1, unit: '大さじ' },
+          { name: 'お湯（カラメル止め用）', amount: 1, unit: '大さじ' }
+        ],
+        steps: [
+          '小鍋にカラメル用の砂糖と水を入れて中火にかけ、濃い琥珀色になったら火を止めてお湯を加え、耐熱カップに流し入れる。',
+          '牛乳と砂糖を小鍋で人肌程度（約50℃）に温めて砂糖を溶かす。',
+          'ボウルに卵を割りほぐし（泡立てないよう静かに）、温めた牛乳とバニラエッセンスを加えて混ぜ、茶こしでこす。',
+          'カップに静かに注ぎ、アルミホイルでふたをする。鍋に2cmほど湯を張ってカップを並べ、ごく弱火で12〜15分蒸し焼きにする。',
+          '粗熱が取れたら冷蔵庫で2時間以上しっかり冷やして完成。'
+        ],
+        tips: '蒸すときの火加減は「絶対に沸騰させないごく弱火」がポイント。すが入らずシルクのようになめらかに仕上がります。'
+      },
+      {
+        id: 'rec-ebichuka',
+        title: 'えびとブロッコリーの中華炒め',
+        category: '中華',
+        time: 12,
+        difficulty: 'かんたん',
+        calories: 260,
+        baseServings: 2,
+        description: 'ぷりぷりのえびと彩り鮮やかなブロッコリーを、鶏ガラとごま油でさっと仕上げる時短おかず。',
+        fridgeTags: ['卵'],
+        svgKey: 'ebichuka',
+        bgClass: 'from-teal-50 via-sage-50 to-amber-50',
+        ingredients: [
+          { name: 'むきえび', amount: 160, unit: 'g' },
+          { name: 'ブロッコリー', amount: 0.5, unit: '株' },
+          { name: '卵（ふんわり炒め用）', amount: 1, unit: '個' },
+          { name: '酒', amount: 1, unit: '大さじ' },
+          { name: '鶏ガラスープの素', amount: 1, unit: '小さじ' },
+          { name: '片栗粉', amount: 1, unit: '小さじ' },
+          { name: 'ごま油', amount: 1, unit: '大さじ' }
+        ],
+        steps: [
+          'ブロッコリーは小房に分けてレンジ（600W）で1分30秒加熱する。えびは酒半量と片栗粉をもみ込む。',
+          'フライパンにごま油半量を熱し、溶き卵をふんわり炒めて一度取り出す。',
+          '残りのごま油でえびを炒め、色が変わったらブロッコリーを加えて炒め合わせる。',
+          '残りの酒・鶏ガラスープの素を加えて手早く絡め、卵を戻し入れてさっと混ぜたら完成。'
+        ],
+        tips: 'えびに片栗粉をもみ込んでから炒めることで、縮みにくくぷりぷりの食感に仕上がります。'
+      }
+    ];
+
+    /* -----------------------------------------------------------
+       2. アプリ状態管理
+       ----------------------------------------------------------- */
+    let state = {
+      recipes: [],
+      favorites: [],
+      searchQuery: '',
+      activeCategory: 'すべて',
+      selectedFridge: [],
+      currentRecipeId: null,
+      currentServings: 2,
+      checkedSteps: {} // { recipeId: [true, false, ...] }
+    };
+
+    // キッチンタイマー状態
+    let timerState = {
+      totalSeconds: 180,
+      remainingSeconds: 180,
+      intervalId: null,
+      isRunning: false
+    };
+
+    /* -----------------------------------------------------------
+       3. カスタムSVGイラスト生成（外部画像リンク切れゼロ）
+       ----------------------------------------------------------- */
+    function getRecipeSvg(svgKey) {
+      const svgs = {
+        nikujaga: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 湯気 -->
+            <path d="M85 28 C82 20, 90 15, 86 8" stroke="#D96B43" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M110 24 C107 16, 115 11, 111 4" stroke="#D96B43" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M135 28 C132 20, 140 15, 136 8" stroke="#D96B43" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <!-- 器の影 -->
+            <ellipse cx="110" cy="128" rx="68" ry="12" fill="#E5DAC8"/>
+            <!-- 和食器ボウル -->
+            <path d="M40 72 C40 118, 68 128, 110 128 C152 128, 180 118, 180 72 Z" fill="#4B5D67"/>
+            <ellipse cx="110" cy="72" rx="70" ry="22" fill="#637885"/>
+            <ellipse cx="110" cy="74" rx="62" ry="17" fill="#C98A4B"/>
+            <!-- じゃがいも -->
+            <ellipse cx="86" cy="72" rx="18" ry="13" fill="#F2C879" stroke="#D9A852" stroke-width="1.5"/>
+            <ellipse cx="132" cy="74" rx="17" ry="12" fill="#F4CF86" stroke="#D9A852" stroke-width="1.5"/>
+            <!-- にんじん -->
+            <circle cx="110" cy="64" r="11" fill="#E86F3A"/>
+            <circle cx="72" cy="66" r="8" fill="#E86F3A"/>
+            <!-- お肉＆玉ねぎ -->
+            <path d="M92 78 C102 70, 120 72, 126 80 C118 86, 98 86, 92 78 Z" fill="#8C4A32"/>
+            <path d="M96 63 C106 58, 124 60, 132 66" stroke="#FAF3E0" stroke-width="4" stroke-linecap="round"/>
+            <!-- 絹さや -->
+            <path d="M95 58 Q110 50 126 59 Q110 64 95 58 Z" fill="#5D9C59"/>
+            <path d="M104 68 Q118 62 132 69 Q118 74 104 68 Z" fill="#6FB36A"/>
+          </svg>`,
+        omurice: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="110" cy="116" rx="82" ry="24" fill="#E5DAC8"/>
+            <!-- お皿 -->
+            <ellipse cx="110" cy="108" rx="80" ry="26" fill="#FFFFFF" stroke="#E8DFD1" stroke-width="2"/>
+            <ellipse cx="110" cy="108" rx="60" ry="17" fill="#FAF7F2"/>
+            <!-- ふわとろオムレツ本体 -->
+            <path d="M46 98 C46 60, 78 48, 110 48 C142 48, 174 60, 174 98 C174 114, 146 118, 110 118 C74 118, 46 114, 46 98 Z" fill="#F8C63D"/>
+            <path d="M58 84 C68 62, 100 54, 134 58 C154 61, 166 74, 166 86 C140 76, 84 74, 58 84 Z" fill="#FCE07A" opacity="0.7"/>
+            <!-- ケチャップの波線 -->
+            <path d="M72 78 Q82 68 92 78 T112 78 T132 78 T150 76" stroke="#D94436" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+            <!-- パセリ -->
+            <circle cx="152" cy="96" r="6" fill="#558B59"/>
+            <circle cx="158" cy="92" r="5" fill="#6BA368"/>
+            <circle cx="147" cy="93" r="4.5" fill="#6BA368"/>
+          </svg>`,
+        teriyaki: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 角皿 -->
+            <rect x="26" y="42" width="168" height="86" rx="18" fill="#E5DAC8"/>
+            <rect x="26" y="36" width="168" height="86" rx="18" fill="#FAF7F2" stroke="#D8CEBE" stroke-width="2"/>
+            <!-- 付け合わせキャベツ -->
+            <circle cx="62" cy="82" r="22" fill="#CFE3C5"/>
+            <path d="M48 76 Q62 66 76 76 M46 86 Q62 78 78 86" stroke="#8CB37E" stroke-width="2" stroke-linecap="round"/>
+            <!-- 照り焼きチキン切り身 -->
+            <rect x="78" y="54" width="84" height="16" rx="7" fill="#A64B24"/>
+            <rect x="82" y="72" width="84" height="16" rx="7" fill="#B8562A"/>
+            <rect x="86" y="90" width="80" height="16" rx="7" fill="#9E441F"/>
+            <!-- テカリと白ごま -->
+            <path d="M90 59 H148 M94 77 H152 M98 95 H148" stroke="#E08B55" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="105" cy="62" r="1.8" fill="#FFF7E6"/><circle cx="122" cy="60" r="1.8" fill="#FFF7E6"/>
+            <circle cx="135" cy="79" r="1.8" fill="#FFF7E6"/><circle cx="114" cy="81" r="1.8" fill="#FFF7E6"/>
+            <circle cx="126" cy="97" r="1.8" fill="#FFF7E6"/><circle cx="142" cy="95" r="1.8" fill="#FFF7E6"/>
+            <!-- レモン -->
+            <path d="M52 104 A14 14 0 0 1 74 104 Z" fill="#F7D348"/>
+          </svg>`,
+        mapo: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="110" cy="126" rx="70" ry="12" fill="#E5DAC8"/>
+            <!-- 土鍋・中華皿 -->
+            <path d="M42 74 C42 114, 70 126, 110 126 C150 126, 178 114, 178 74 Z" fill="#3B322E"/>
+            <ellipse cx="110" cy="74" rx="68" ry="22" fill="#524640"/>
+            <!-- 旨辛あん -->
+            <ellipse cx="110" cy="76" rx="60" ry="17" fill="#C44125"/>
+            <!-- 豆腐キューブ -->
+            <rect x="74" y="64" width="18" height="14" rx="3" fill="#FFFBF2" stroke="#E8DEC8" stroke-width="1"/>
+            <rect x="102" y="60" width="19" height="15" rx="3" fill="#FFFBF2" stroke="#E8DEC8" stroke-width="1"/>
+            <rect x="128" y="66" width="18" height="14" rx="3" fill="#FFFBF2" stroke="#E8DEC8" stroke-width="1"/>
+            <rect x="90" y="75" width="18" height="13" rx="3" fill="#FFF7E6" stroke="#E8DEC8" stroke-width="1"/>
+            <rect x="115" y="76" width="17" height="13" rx="3" fill="#FFF7E6" stroke="#E8DEC8" stroke-width="1"/>
+            <!-- 青ねぎ -->
+            <circle cx="96" cy="68" r="3" fill="#5D9C59"/>
+            <circle cx="122" cy="72" r="3" fill="#5D9C59"/>
+            <circle cx="108" cy="82" r="3" fill="#6FB36A"/>
+            <circle cx="84" cy="78" r="2.5" fill="#6FB36A"/>
+            <circle cx="136" cy="78" r="2.5" fill="#5D9C59"/>
+          </svg>`,
+        pasta: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="110" cy="116" rx="76" ry="24" fill="#E5DAC8"/>
+            <ellipse cx="110" cy="108" rx="76" ry="26" fill="#FFFFFF" stroke="#E8DFD1" stroke-width="2"/>
+            <!-- スパゲッティの渦 -->
+            <ellipse cx="110" cy="96" rx="48" ry="22" fill="#F5C767"/>
+            <path d="M72 96 C78 80, 142 80, 148 96" stroke="#E3A83B" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M80 102 C92 88, 128 88, 140 102" stroke="#E3A83B" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M88 86 C100 76, 122 76, 134 86" stroke="#D96B43" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+            <!-- トマト -->
+            <circle cx="88" cy="86" r="9" fill="#E04B3A"/>
+            <circle cx="132" cy="92" r="9" fill="#E04B3A"/>
+            <circle cx="112" cy="78" r="8" fill="#EB5E4B"/>
+            <!-- モッツァレラチーズ -->
+            <ellipse cx="106" cy="94" rx="10" ry="8" fill="#FFFDF8" stroke="#EAE2D3" stroke-width="1.5"/>
+            <ellipse cx="126" cy="80" rx="8" ry="6.5" fill="#FFFDF8" stroke="#EAE2D3" stroke-width="1.5"/>
+            <!-- バジル -->
+            <path d="M108 72 Q118 62 126 70 Q116 78 108 72 Z" fill="#4D8B55"/>
+            <path d="M96 76 Q104 66 112 72 Q104 80 96 76 Z" fill="#63A36B"/>
+          </svg>`,
+        shogayaki: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="110" cy="116" rx="78" ry="24" fill="#E5DAC8"/>
+            <ellipse cx="110" cy="108" rx="78" ry="26" fill="#FFFFFF" stroke="#E8DFD1" stroke-width="2"/>
+            <!-- 千切りキャベツ -->
+            <ellipse cx="76" cy="92" rx="28" ry="18" fill="#D4E8C9"/>
+            <path d="M58 90 Q74 80 92 90 M62 98 Q78 88 94 98" stroke="#8EB87E" stroke-width="2" stroke-linecap="round"/>
+            <!-- プチトマト -->
+            <circle cx="62" cy="106" r="8" fill="#E04B3A"/>
+            <!-- 豚の生姜焼き -->
+            <ellipse cx="122" cy="86" rx="30" ry="13" transform="rotate(-8 122 86)" fill="#B56537"/>
+            <ellipse cx="132" cy="98" rx="30" ry="13" transform="rotate(-4 132 98)" fill="#C47341"/>
+            <ellipse cx="126" cy="108" rx="28" ry="12" fill="#A6582D"/>
+            <!-- 玉ねぎスライス -->
+            <path d="M106 84 Q124 78 142 86" stroke="#F7E4C1" stroke-width="3" stroke-linecap="round"/>
+            <path d="M114 98 Q130 92 148 100" stroke="#F7E4C1" stroke-width="3" stroke-linecap="round"/>
+          </svg>`,
+        gomaae: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="110" cy="126" rx="52" ry="10" fill="#E5DAC8"/>
+            <!-- 小鉢 -->
+            <path d="M58 82 C58 116, 78 126, 110 126 C142 126, 162 116, 162 82 Z" fill="#5F7A61"/>
+            <ellipse cx="110" cy="82" rx="52" ry="15" fill="#779679"/>
+            <ellipse cx="110" cy="83" rx="45" ry="11" fill="#F2ECE1"/>
+            <!-- ほうれん草の山 -->
+            <path d="M74 84 C76 58, 96 50, 110 50 C124 50, 144 58, 146 84 C132 92, 88 92, 74 84 Z" fill="#3B7A4A"/>
+            <path d="M84 78 C92 64, 116 62, 134 76" stroke="#2B5E37" stroke-width="3" stroke-linecap="round"/>
+            <path d="M90 68 C102 58, 120 58, 130 68" stroke="#539662" stroke-width="3" stroke-linecap="round"/>
+            <!-- すりごま -->
+            <circle cx="102" cy="60" r="2.2" fill="#F2D7A0"/>
+            <circle cx="112" cy="57" r="2.2" fill="#F2D7A0"/>
+            <circle cx="120" cy="62" r="2.2" fill="#F2D7A0"/>
+            <circle cx="108" cy="66" r="2" fill="#E5C07B"/>
+            <circle cx="116" cy="68" r="2" fill="#E5C07B"/>
+            <circle cx="96" cy="67" r="2" fill="#E5C07B"/>
+          </svg>`,
+        pudding: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 喫茶店風シルバー脚付き皿 -->
+            <ellipse cx="110" cy="132" rx="42" ry="8" fill="#D5D0C8"/>
+            <path d="M98 112 L122 112 L116 130 L104 130 Z" fill="#C4C0B8"/>
+            <ellipse cx="110" cy="110" rx="64" ry="14" fill="#ECEAE4" stroke="#D5D0C8" stroke-width="2"/>
+            <!-- プリン本体 -->
+            <path d="M74 106 L84 58 C86 50, 134 50, 136 58 L146 106 C146 113, 74 113, 74 106 Z" fill="#FDE181"/>
+            <!-- カラメルソース -->
+            <path d="M84 58 C86 48, 134 48, 136 58 L138 68 C130 72, 126 64, 120 72 C114 78, 106 66, 100 72 C94 76, 88 68, 82 70 Z" fill="#8C3E18"/>
+            <!-- 生クリーム＆さくらんぼ -->
+            <circle cx="110" cy="48" r="8" fill="#FFFFFF"/>
+            <circle cx="110" cy="40" r="6" fill="#D93B3B"/>
+            <path d="M110 34 Q114 24 122 22" stroke="#557561" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>`,
+        ebichuka: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="110" cy="116" rx="76" ry="24" fill="#E5DAC8"/>
+            <ellipse cx="110" cy="108" rx="76" ry="26" fill="#FFFFFF" stroke="#E8DFD1" stroke-width="2"/>
+            <!-- ふわふわ卵 -->
+            <ellipse cx="110" cy="96" rx="46" ry="18" fill="#FCE28B"/>
+            <!-- ブロッコリー -->
+            <circle cx="88" cy="88" r="13" fill="#4E8C56"/>
+            <circle cx="130" cy="92" r="13" fill="#4E8C56"/>
+            <circle cx="112" cy="80" r="11" fill="#63A36B"/>
+            <!-- ぷりぷりえび -->
+            <path d="M82 96 C78 82, 98 76, 106 88 C110 94, 102 104, 94 100" stroke="#F07855" stroke-width="10" stroke-linecap="round" fill="none"/>
+            <path d="M114 96 C112 84, 130 80, 136 90 C140 98, 130 106, 122 102" stroke="#F07855" stroke-width="10" stroke-linecap="round" fill="none"/>
+          </svg>`,
+        custom: `
+          <svg viewBox="0 0 220 150" class="w-44 h-32 drop-shadow-sm" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 温かみのあるフライパン・スキレット -->
+            <ellipse cx="105" cy="112" rx="64" ry="22" fill="#E5DAC8"/>
+            <path d="M160 100 L200 92" stroke="#4A403A" stroke-width="10" stroke-linecap="round"/>
+            <ellipse cx="105" cy="100" rx="60" ry="24" fill="#4A403A"/>
+            <ellipse cx="105" cy="98" rx="52" ry="19" fill="#635750"/>
+            <!-- 彩り食材 -->
+            <circle cx="88" cy="96" r="11" fill="#F2C879"/>
+            <circle cx="114" cy="92" r="12" fill="#D96B43"/>
+            <circle cx="126" cy="104" r="9" fill="#6B8E78"/>
+            <circle cx="98" cy="106" r="8" fill="#FAF7F2"/>
+            <!-- 湯気 -->
+            <path d="M90 58 C88 48, 96 42, 92 32" stroke="#D96B43" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+            <path d="M115 54 C113 44, 121 38, 117 28" stroke="#D96B43" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+          </svg>`
+      };
+      return svgs[svgKey] || svgs.custom;
+    }
+
+    /* -----------------------------------------------------------
+       4. 初期化・localStorage読み込み
+       ----------------------------------------------------------- */
+    function initApp() {
+      loadFromStorage();
+      renderCategories();
+      renderFridgeChips();
+      updateFavCountBadge();
+      renderRecipes();
+      setupEventListeners();
+    }
+
+    function loadFromStorage() {
+      let userRecipes = [];
+      try {
+        const savedFavs = localStorage.getItem(STORAGE_KEYS.FAVORITES);
+        state.favorites = savedFavs ? JSON.parse(savedFavs) : [];
+      } catch (e) {
+        console.warn('お気に入りの読み込みに失敗しました:', e);
+        state.favorites = [];
+      }
+
+      try {
+        const savedUserRecipes = localStorage.getItem(STORAGE_KEYS.USER_RECIPES);
+        userRecipes = savedUserRecipes ? JSON.parse(savedUserRecipes) : [];
+      } catch (e) {
+        console.warn('ユーザーレシピの読み込みに失敗しました:', e);
+        userRecipes = [];
+      }
+
+      // ユーザー投稿レシピを先頭にして統合
+      state.recipes = [...userRecipes, ...INITIAL_RECIPES];
+    }
+
+    function saveFavorites() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(state.favorites));
+      } catch (e) {
+        console.warn('お気に入りの保存に失敗しました:', e);
+      }
+    }
+
+    function saveUserRecipes() {
+      try {
+        const userOnly = state.recipes.filter(r => r.isUserCreated);
+        localStorage.setItem(STORAGE_KEYS.USER_RECIPES, JSON.stringify(userOnly));
+      } catch (e) {
+        console.warn('ユーザーレシピの保存に失敗しました:', e);
+      }
+    }
+
+    function setupEventListeners() {
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearchBtn');
+
+      searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value.trim();
+        clearBtn.classList.toggle('hidden', state.searchQuery.length === 0);
+        renderRecipes();
+      });
+
+      // ESCキーでモーダルを閉じる
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeDetailModal();
+          closePostModal();
+        }
+      });
+
+      // 背景クリックでモーダルを閉じる
+      document.getElementById('detailModal').addEventListener('click', (e) => {
+        if (e.target.id === 'detailModal') closeDetailModal();
+      });
+      document.getElementById('postModal').addEventListener('click', (e) => {
+        if (e.target.id === 'postModal') closePostModal();
+      });
+    }
+
+    /* -----------------------------------------------------------
+       5. フィルターUI描画と操作
+       ----------------------------------------------------------- */
+    function renderCategories() {
+      const container = document.getElementById('categoryContainer');
+      container.innerHTML = CATEGORIES.map(cat => {
+        const isActive = state.activeCategory === cat;
+        const activeClasses = isActive
+          ? 'bg-terracotta-500 text-white border-terracotta-500 shadow-sm'
+          : 'bg-white text-ink-700 border-cream-300 hover:bg-cream-200/70';
+        return `
+          <button
+            type="button"
+            onclick="selectCategory('${cat}')"
+            class="px-4 py-2 rounded-full text-sm font-bold border transition-all ${activeClasses}"
+          >
+            ${cat === 'お気に入り' ? '♥ ' : ''}${cat}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectCategory(category) {
+      state.activeCategory = category;
+      renderCategories();
+      renderRecipes();
+    }
+
+    function renderFridgeChips() {
+      const container = document.getElementById('fridgeChipsContainer');
+      const clearBtn = document.getElementById('clearFridgeBtn');
+      clearBtn.classList.toggle('hidden', state.selectedFridge.length === 0);
+
+      container.innerHTML = FRIDGE_INGREDIENTS.map(item => {
+        const isSelected = state.selectedFridge.includes(item.id);
+        const cls = isSelected
+          ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
+          : 'bg-cream-50 text-ink-700 border-cream-300 hover:border-sage-500 hover:text-sage-700';
+        return `
+          <button
+            type="button"
+            onclick="toggleFridgeIngredient('${item.id}')"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium border transition-all ${cls}"
+          >
+            <span>${isSelected ? '✓' : '+'}</span>
+            <span>${item.label}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleFridgeIngredient(ingredientId) {
+      const idx = state.selectedFridge.indexOf(ingredientId);
+      if (idx >= 0) {
+        state.selectedFridge.splice(idx, 1);
+      } else {
+        state.selectedFridge.push(ingredientId);
+      }
+      renderFridgeChips();
+      renderRecipes();
+    }
+
+    function clearFridgeFilters() {
+      state.selectedFridge = [];
+      renderFridgeChips();
+      renderRecipes();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      state.searchQuery = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderRecipes();
+    }
+
+    function resetAllFilters() {
+      state.activeCategory = 'すべて';
+      state.selectedFridge = [];
+      clearSearch();
+      renderCategories();
+      renderFridgeChips();
+      renderRecipes();
+    }
+
+    /* -----------------------------------------------------------
+       6. レシピのフィルタリング＆一覧描画
+       ----------------------------------------------------------- */
+    function getFilteredRecipes() {
+      const q = state.searchQuery.toLowerCase();
+
+      let list = state.recipes.filter(recipe => {
+        // カテゴリ絞り込み
+        if (state.activeCategory === 'お気に入り') {
+          if (!state.favorites.includes(recipe.id)) return false;
+        } else if (state.activeCategory === '15分時短') {
+          if (recipe.time > 15) return false;
+        } else if (state.activeCategory !== 'すべて') {
+          if (recipe.category !== state.activeCategory) return false;
+        }
+
+        // 冷蔵庫の食材チップ絞り込み（選択したすべての食材を含むレシピ）
+        if (state.selectedFridge.length > 0) {
+          const ingText = recipe.ingredients.map(i => i.name).join(' ');
+          const tags = recipe.fridgeTags || [];
+          const matchesAll = state.selectedFridge.every(chip =>
+            tags.includes(chip) || ingText.includes(chip)
+          );
+          if (!matchesAll) return false;
+        }
+
+        // キーワード検索（タイトル・説明・材料・カテゴリ）
+        if (q) {
+          const haystack = [
+            recipe.title,
+            recipe.description,
+            recipe.category,
+            ...(recipe.fridgeTags || []),
+            ...recipe.ingredients.map(i => i.name)
+          ].join(' ').toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+
+        return true;
+      });
+
+      // 並び替え
+      const sortValue = document.getElementById('sortSelect').value;
+      if (sortValue === 'timeAsc') {
+        list.sort((a, b) => a.time - b.time);
+      } else if (sortValue === 'calAsc') {
+        list.sort((a, b) => a.calories - b.calories);
+      } else if (sortValue === 'newest') {
+        list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      }
+
+      return list;
+    }
+
+    function renderRecipes() {
+      const grid = document.getElementById('recipeGrid');
+      const emptyState = document.getElementById('emptyState');
+      const heading = document.getElementById('listHeading');
+      const countEl = document.getElementById('recipeCount');
+
+      const filtered = getFilteredRecipes();
+
+      heading.textContent = state.activeCategory === 'すべて'
+        ? 'すべてのレシピ'
+        : `${state.activeCategory}のレシピ`;
+      countEl.textContent = `${filtered.length}品`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(recipe => {
+        const isFav = state.favorites.includes(recipe.id);
+        const bgGradient = recipe.bgClass || 'from-amber-50 via-cream-100 to-cream-200';
+
+        return `
+          <article
+            onclick="openDetailModal('${recipe.id}')"
+            class="group cursor-pointer bg-white rounded-3xl border border-cream-200 overflow-hidden shadow-card hover:shadow-soft hover:-translate-y-1 transition-all duration-200 flex flex-col"
+          >
+            <!-- カスタムSVGビジュアルエリア -->
+            <div class="relative h-48 bg-gradient-to-br ${bgGradient} flex items-center justify-center p-4 overflow-hidden">
+              <div class="transform group-hover:scale-105 transition-transform duration-300">
+                ${getRecipeSvg(recipe.svgKey)}
+              </div>
+
+              <!-- 左上：カテゴリ＆時短バッジ -->
+              <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/90 text-ink-700 shadow-sm">
+                  ${escapeHtml(recipe.category)}
+                </span>
+                ${recipe.time <= 15 ? `
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-sage-600 text-white shadow-sm">
+                    15分時短
+                  </span>
+                ` : ''}
+                ${recipe.isUserCreated ? `
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-terracotta-500 text-white shadow-sm">
+                    マイレシピ
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- 右上：お気に入りハートボタン -->
+              <button
+                type="button"
+                onclick="event.stopPropagation(); toggleFavorite('${recipe.id}')"
+                class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow-sm flex items-center justify-center transition-transform active:scale-90"
+                aria-label="お気に入りに追加"
+              >
+                <svg class="w-5 h-5 ${isFav ? 'text-terracotta-500 fill-terracotta-500' : 'text-ink-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- カード本文 -->
+            <div class="p-5 flex-1 flex flex-col">
+              <h3 class="font-serif text-lg font-bold text-ink-900 group-hover:text-terracotta-600 transition-colors mb-1.5 leading-snug">
+                ${escapeHtml(recipe.title)}
+              </h3>
+              <p class="text-xs sm:text-sm text-ink-500 line-clamp-2 mb-4 flex-1 leading-relaxed">
+                ${escapeHtml(recipe.description)}
+              </p>
+
+              <!-- メタ情報（調理時間・難易度・カロリー） -->
+              <div class="pt-3 border-t border-cream-100 flex items-center justify-between text-xs text-ink-500 font-medium">
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-terracotta-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                    </svg>
+                    ${recipe.time}分
+                  </span>
+                  <span class="inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-sage-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M12 20V10M18 20V4M6 20v-4"/>
+                    </svg>
+                    ${escapeHtml(recipe.difficulty)}
+                  </span>
+                </div>
+                <span class="text-ink-400">${recipe.calories} kcal</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    /* -----------------------------------------------------------
+       7. お気に入り機能
+       ----------------------------------------------------------- */
+    function toggleFavorite(recipeId) {
+      const idx = state.favorites.indexOf(recipeId);
+      if (idx >= 0) {
+        state.favorites.splice(idx, 1);
+        showToast('お気に入りから解除しました');
+      } else {
+        state.favorites.push(recipeId);
+        showToast('お気に入りに保存しました ♥');
+      }
+      saveFavorites();
+      updateFavCountBadge();
+      renderRecipes();
+
+      // 詳細モーダルが開いている場合はボタン表示も更新
+      if (state.currentRecipeId === recipeId) {
+        updateModalFavButton(recipeId);
+      }
+    }
+
+    function updateFavCountBadge() {
+      document.getElementById('favCountBadge').textContent = state.favorites.length;
+    }
+
+    /* -----------------------------------------------------------
+       8. レシピ詳細モーダル（人数自動計算・手順チェック）
+       ----------------------------------------------------------- */
+    function openDetailModal(recipeId) {
+      const recipe = state.recipes.find(r => r.id === recipeId);
+      if (!recipe) return;
+
+      state.currentRecipeId = recipeId;
+      state.currentServings = recipe.baseServings || 2;
+
+      // ヘッダービジュアル更新
+      const visual = document.getElementById('modalHeaderVisual');
+      visual.className = `relative h-56 sm:h-64 flex items-center justify-center overflow-hidden bg-gradient-to-br ${recipe.bgClass || 'from-amber-50 via-cream-100 to-cream-200'}`;
+      // 既存のSVGコンテナを入れ替え
+      const existingSvgWrap = visual.querySelector('.modal-svg-wrap');
+      if (existingSvgWrap) existingSvgWrap.remove();
+      const svgWrap = document.createElement('div');
+      svgWrap.className = 'modal-svg-wrap transform scale-110 sm:scale-125';
+      svgWrap.innerHTML = getRecipeSvg(recipe.svgKey);
+      visual.prepend(svgWrap);
+
+      updateModalFavButton(recipeId);
+
+      // タグ・タイトル・メタ情報
+      const tagsHtml = [
+        `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-cream-200 text-ink-700">${escapeHtml(recipe.category)}</span>`,
+        recipe.time <= 15 ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-sage-100 text-sage-700">15分時短</span>` : '',
+        recipe.isUserCreated ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-terracotta-100 text-terracotta-700">マイレシピ</span>` : ''
+      ].join('');
+      document.getElementById('modalTags').innerHTML = tagsHtml;
+      document.getElementById('modalTitle').textContent = recipe.title;
+      document.getElementById('modalDesc').textContent = recipe.description;
+      document.getElementById('modalTime').textContent = `${recipe.time}分`;
+      document.getElementById('modalDifficulty').textContent = recipe.difficulty;
+      document.getElementById('modalCalories').textContent = `${recipe.calories} kcal`;
+      document.getElementById('modalTips').textContent = recipe.tips || 'お好みの味付けに調整してお楽しみください。';
+
+      // ユーザー投稿レシピの場合は削除ボタンを表示（confirm()を使わずインライン確認）
+      const deleteArea = document.getElementById('modalDeleteArea');
+      if (recipe.isUserCreated) {
+        deleteArea.innerHTML = `
+          <button type="button" onclick="confirmDeleteInline('${recipe.id}')" class="text-xs font-medium text-ink-400 hover:text-red-600 underline">このレシピを削除</button>
+        `;
+      } else {
+        deleteArea.innerHTML = '';
+      }
+
+      // 人数切替＆材料描画
+      updateServingButtons();
+      renderModalIngredients(recipe);
+
+      // 手順チェックボックス描画
+      if (!state.checkedSteps[recipeId]) {
+        state.checkedSteps[recipeId] = new Array(recipe.steps.length).fill(false);
+      }
+      renderModalSteps(recipe);
+
+      // タイマーをレシピに合わせて初期設定（例：3分）
+      dismissTimerAlert();
+
+      document.getElementById('detailModal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+      state.currentRecipeId = null;
+    }
+
+    function updateModalFavButton(recipeId) {
+      const btn = document.getElementById('modalFavBtn');
+      const isFav = state.favorites.includes(recipeId);
+      btn.onclick = () => toggleFavorite(recipeId);
+      btn.innerHTML = `
+        <svg class="w-4 h-4 ${isFav ? 'text-terracotta-500 fill-terracotta-500' : 'text-ink-400 fill-none'}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <span class="${isFav ? 'text-terracotta-600' : 'text-ink-700'}">${isFav ? '保存済み' : 'お気に入り'}</span>
+      `;
+    }
+
+    function changeServings(servings) {
+      state.currentServings = servings;
+      updateServingButtons();
+      const recipe = state.recipes.find(r => r.id === state.currentRecipeId);
+      if (recipe) renderModalIngredients(recipe);
+    }
+
+    function updateServingButtons() {
+      document.querySelectorAll('.serving-btn').forEach(btn => {
+        const val = Number(btn.getAttribute('data-serving'));
+        if (val === state.currentServings) {
+          btn.className = 'serving-btn px-3 py-1 rounded-lg text-xs font-bold bg-terracotta-500 text-white shadow-sm transition-colors';
+        } else {
+          btn.className = 'serving-btn px-3 py-1 rounded-lg text-xs font-bold text-ink-700 hover:bg-cream-200 transition-colors';
+        }
+      });
+    }
+
+    /**
+     * 人数に応じて分量を美しくフォーマットするヘルパー
+     */
+    function formatScaledAmount(amount, ratio) {
+      if (typeof amount !== 'number' || Number.isNaN(amount)) {
+        return amount;
+      }
+      const scaled = Math.round(amount * ratio * 100) / 100;
+      // よくある分数は見やすく変換
+      if (scaled === 0.25) return '1/4';
+      if (scaled === 0.5) return '1/2';
+      if (scaled === 0.75) return '3/4';
+      if (scaled === 1.5) return '1と1/2';
+      return Number.isInteger(scaled) ? String(scaled) : String(Number(scaled.toFixed(1)));
+    }
+
+    function renderModalIngredients(recipe) {
+      const ratio = state.currentServings / (recipe.baseServings || 2);
+      const listEl = document.getElementById('modalIngredients');
+
+      listEl.innerHTML = recipe.ingredients.map(ing => {
+        const formatted = formatScaledAmount(ing.amount, ratio);
+        // 大さじ・小さじは単位を前に表示して自然な日本語に
+        const isSpoon = ing.unit === '大さじ' || ing.unit === '小さじ';
+        const displayQty = typeof ing.amount === 'number'
+          ? (isSpoon ? `${ing.unit}${formatted}` : `${formatted}${ing.unit}`)
+          : `${escapeHtml(String(ing.amount))}${escapeHtml(ing.unit || '')}`;
+
+        return `
+          <li class="py-2.5 flex items-center justify-between gap-4">
+            <span class="text-ink-900 font-medium">${escapeHtml(ing.name)}</span>
+            <span class="text-terracotta-700 font-bold shrink-0">${displayQty}</span>
+          </li>
+        `;
+      }).join('');
+    }
+
+    function renderModalSteps(recipe) {
+      const stepsEl = document.getElementById('modalSteps');
+      const checks = state.checkedSteps[recipe.id] || [];
+
+      stepsEl.innerHTML = recipe.steps.map((step, index) => {
+        const isChecked = !!checks[index];
+        return `
+          <li
+            onclick="toggleStepCheck('${recipe.id}', ${index})"
+            class="cursor-pointer flex items-start gap-3 p-3.5 rounded-xl border transition-all ${
+              isChecked
+                ? 'bg-sage-50/70 border-sage-200 text-ink-400'
+                : 'bg-cream-50/60 border-cream-200 hover:border-sage-300 text-ink-900'
+            }"
+          >
+            <div class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors ${
+              isChecked ? 'bg-sage-600 border-sage-600 text-white' : 'bg-white border-cream-300 text-transparent'
+            }">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+            </div>
+            <div class="flex-1 text-sm sm:text-base leading-relaxed">
+              <span class="inline-block font-bold text-xs px-2 py-0.5 rounded-md mr-1.5 ${
+                isChecked ? 'bg-sage-100 text-sage-600' : 'bg-terracotta-100 text-terracotta-700'
+              }">STEP ${index + 1}</span>
+              <span class="${isChecked ? 'line-through' : ''}">${escapeHtml(step)}</span>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      updateStepProgress(recipe.id, recipe.steps.length);
+    }
+
+    function toggleStepCheck(recipeId, stepIndex) {
+      const recipe = state.recipes.find(r => r.id === recipeId);
+      if (!recipe) return;
+      if (!state.checkedSteps[recipeId]) {
+        state.checkedSteps[recipeId] = new Array(recipe.steps.length).fill(false);
+      }
+      state.checkedSteps[recipeId][stepIndex] = !state.checkedSteps[recipeId][stepIndex];
+      renderModalSteps(recipe);
+    }
+
+    function updateStepProgress(recipeId, totalSteps) {
+      const checks = state.checkedSteps[recipeId] || [];
+      const doneCount = checks.filter(Boolean).length;
+      const pct = totalSteps > 0 ? Math.round((doneCount / totalSteps) * 100) : 0;
+
+      document.getElementById('stepProgressText').textContent = `${doneCount} / ${totalSteps} 完了`;
+      document.getElementById('stepProgressBar').style.width = `${pct}%`;
+
+      if (totalSteps > 0 && doneCount === totalSteps) {
+        showToast('すべての手順が完了しました！おつかれさまです 🍽️');
+      }
+    }
+
+    /* -----------------------------------------------------------
+       9. 内蔵キッチンタイマー機能（Web Audio API チャイム付き）
+       ----------------------------------------------------------- */
+    function formatTimer(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+      document.getElementById('timerDisplay').textContent = formatTimer(timerState.remainingSeconds);
+      const btn = document.getElementById('timerStartPauseBtn');
+      const badge = document.getElementById('timerStatusBadge');
+
+      if (timerState.isRunning) {
+        btn.textContent = '一時停止';
+        btn.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-sage-600 hover:bg-sage-700 transition-colors min-w-[100px]';
+        badge.textContent = '計測中';
+        badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-sage-100 text-sage-700';
+      } else if (timerState.remainingSeconds === 0) {
+        btn.textContent = 'スタート';
+        btn.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-terracotta-500 hover:bg-terracotta-600 transition-colors min-w-[100px]';
+        badge.textContent = '完了！';
+        badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-terracotta-100 text-terracotta-700';
+      } else {
+        btn.textContent = 'スタート';
+        btn.className = 'px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-terracotta-500 hover:bg-terracotta-600 transition-colors min-w-[100px]';
+        badge.textContent = '待機中';
+        badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-cream-100 text-ink-500';
+      }
+    }
+
+    function setTimerMinutes(minutes) {
+      stopTimerInterval();
+      dismissTimerAlert();
+      timerState.totalSeconds = minutes * 60;
+      timerState.remainingSeconds = minutes * 60;
+      updateTimerUI();
+      showToast(`タイマーを ${minutes}分 に設定しました`);
+    }
+
+    function applyCustomTimer() {
+      const input = document.getElementById('customTimerInput');
+      const mins = parseInt(input.value, 10);
+      if (Number.isNaN(mins) || mins < 1 || mins > 120) {
+        showToast('1〜120分の間で入力してください');
+        return;
+      }
+      setTimerMinutes(mins);
+      input.value = '';
+    }
+
+    function toggleTimer() {
+      dismissTimerAlert();
+      if (timerState.isRunning) {
+        stopTimerInterval();
+        updateTimerUI();
+      } else {
+        if (timerState.remainingSeconds <= 0) {
+          timerState.remainingSeconds = timerState.totalSeconds || 180;
+        }
+        timerState.isRunning = true;
+        updateTimerUI();
+        timerState.intervalId = setInterval(() => {
+          timerState.remainingSeconds -= 1;
+          if (timerState.remainingSeconds <= 0) {
+            timerState.remainingSeconds = 0;
+            stopTimerInterval();
+            onTimerComplete();
+          }
+          updateTimerUI();
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      stopTimerInterval();
+      dismissTimerAlert();
+      timerState.remainingSeconds = timerState.totalSeconds;
+      updateTimerUI();
+    }
+
+    function stopTimerInterval() {
+      if (timerState.intervalId) {
+        clearInterval(timerState.intervalId);
+        timerState.intervalId = null;
+      }
+      timerState.isRunning = false;
+    }
+
+    function onTimerComplete() {
+      document.getElementById('timerDoneBanner').classList.remove('hidden');
+      showToast('⏰ キッチンタイマーが終了しました！');
+      playChimeSound();
+    }
+
+    function dismissTimerAlert() {
+      document.getElementById('timerDoneBanner').classList.add('hidden');
+    }
+
+    /**
+     * 外部音声ファイル不要で優しいチャイム音を鳴らす（Web Audio API）
+     */
+    function playChimeSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const notes = [523.25, 659.25, 783.99]; // ド・ミ・ソ
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.18);
+          gain.gain.setValueAtTime(0.18, ctx.currentTime + idx * 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.18 + 0.55);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.18);
+          osc.stop(ctx.currentTime + idx * 0.18 + 0.6);
+        });
+      } catch (e) {
+        // 音声再生がブロックされた場合はサイレントにフォールバック
+      }
+    }
+
+    /* -----------------------------------------------------------
+       10. マイレシピ投稿＆削除機能
+       ----------------------------------------------------------- */
+    function openPostModal() {
+      document.getElementById('postModal').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closePostModal() {
+      document.getElementById('postModal').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function handlePostRecipe(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('postTitle').value.trim();
+      const category = document.getElementById('postCategory').value;
+      const time = Math.max(1, parseInt(document.getElementById('postTime').value, 10) || 15);
+      const difficulty = document.getElementById('postDifficulty').value;
+      const calories = Math.max(10, parseInt(document.getElementById('postCalories').value, 10) || 300);
+      const description = document.getElementById('postDesc').value.trim() || 'おうちで手軽に作れる自慢の一品です。';
+      const rawIngredients = document.getElementById('postIngredients').value.trim();
+      const rawSteps = document.getElementById('postSteps').value.trim();
+      const tips = document.getElementById('postTips').value.trim() || '出来立ての温かいうちにお召し上がりください。';
+
+      if (!title || !rawIngredients || !rawSteps) {
+        showToast('必須項目を入力してください');
+        return;
+      }
+
+      // 材料テキストをパース
+      const ingredients = rawIngredients
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => {
+          const parts = line.split(/[、,]/).map(p => p.trim());
+          const name = parts[0] || line;
+          const rawAmt = parts[1] || '適量';
+          const numAmt = Number(rawAmt);
+          const amount = rawAmt !== '' && !Number.isNaN(numAmt) ? numAmt : rawAmt;
+          const unit = parts[2] || '';
+          return { name, amount, unit };
+        });
+
+      const steps = rawSteps
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      // 冷蔵庫チップに一致する食材を自動タグ付け
+      const ingAllText = ingredients.map(i => i.name).join(' ');
+      const detectedFridgeTags = FRIDGE_INGREDIENTS
+        .filter(f => ingAllText.includes(f.id) || title.includes(f.id))
+        .map(f => f.id);
+
+      const newRecipe = {
+        id: 'user-' + Date.now(),
+        title,
+        category,
+        time,
+        difficulty,
+        calories,
+        baseServings: 2,
+        description,
+        fridgeTags: detectedFridgeTags,
+        svgKey: 'custom',
+        bgClass: 'from-terracotta-50 via-cream-100 to-sage-50',
+        ingredients,
+        steps,
+        tips,
+        isUserCreated: true,
+        createdAt: Date.now()
+      };
+
+      state.recipes.unshift(newRecipe);
+      saveUserRecipes();
+
+      // フォームをリセットして閉じる
+      document.getElementById('postRecipeForm').reset();
+      closePostModal();
+
+      // 「すべて」に戻して即座に確認できるようにする
+      state.activeCategory = 'すべて';
+      renderCategories();
+      renderRecipes();
+      showToast(`「${title}」を投稿しました！`);
+    }
+
+    function confirmDeleteInline(recipeId) {
+      const area = document.getElementById('modalDeleteArea');
+      area.innerHTML = `
+        <div class="inline-flex items-center gap-2 bg-red-50 border border-red-200 px-3 py-1.5 rounded-xl">
+          <span class="text-xs font-bold text-red-700">削除しますか？</span>
+          <button type="button" onclick="deleteUserRecipe('${recipeId}')" class="px-2 py-0.5 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-700">削除</button>
+          <button type="button" onclick="openDetailModal('${recipeId}')" class="px-2 py-0.5 rounded-lg bg-white text-ink-700 text-xs font-bold border border-cream-300">戻す</button>
+        </div>
+      `;
+    }
+
+    function deleteUserRecipe(recipeId) {
+      state.recipes = state.recipes.filter(r => r.id !== recipeId);
+      state.favorites = state.favorites.filter(id => id !== recipeId);
+      saveUserRecipes();
+      saveFavorites();
+      updateFavCountBadge();
+      closeDetailModal();
+      renderRecipes();
+      showToast('マイレシピを削除しました');
+    }
+
+    /* -----------------------------------------------------------
+       11. ユーティリティ（トースト通知・XSS対策）
+       ----------------------------------------------------------- */
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto px-4 py-3 rounded-2xl bg-ink-900 text-white text-sm font-medium shadow-lg flex items-center gap-2 transition-all duration-300';
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2800);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ページ読み込み完了時に初期化
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
